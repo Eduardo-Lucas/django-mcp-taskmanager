@@ -25,6 +25,18 @@ def high_priority_tasks() -> list:
     return [{"id": t.id, "title": t.title, "status": t.status} for t in tasks]
 
 @mcp.tool()
+def update_task(task_id: int, title: str | None = None, description: str | None = None) -> dict:
+    """Updates the title and/or description of a task by ID. Omit a field to leave it unchanged."""
+    from tasks.models import Task
+    task = Task.objects.get(id=task_id)
+    if title is not None:
+        task.title = title
+    if description is not None:
+        task.description = description
+    task.save()
+    return {"id": task.id, "title": task.title, "description": task.description}
+
+@mcp.tool()
 def update_task_priority(task_id: int, priority: int) -> dict:
     """Updates the priority of a task by ID. priority: 1=Low, 2=Medium, 3=High."""
     from tasks.models import Task
