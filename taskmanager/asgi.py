@@ -25,6 +25,17 @@ def high_priority_tasks() -> list:
     return [{"id": t.id, "title": t.title, "status": t.status} for t in tasks]
 
 @mcp.tool()
+def update_task_status(task_id: int, status: str) -> dict:
+    """Updates the status of a task. status: todo, doing, done."""
+    from tasks.models import Task
+    if status not in ("todo", "doing", "done"):
+        raise ValueError("status must be todo, doing, or done")
+    task = Task.objects.get(id=task_id)
+    task.status = status
+    task.save()
+    return {"id": task.id, "title": task.title, "status": task.status}
+
+@mcp.tool()
 def create_task(title: str, priority: int = 1, description: str = "", status: str = "todo") -> dict:
     """Creates a new task. priority: 1=Low, 2=Medium, 3=High. status: todo, doing, done."""
     from tasks.models import Task
