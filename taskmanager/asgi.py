@@ -25,6 +25,16 @@ def high_priority_tasks() -> list:
     return [{"id": t.id, "title": t.title, "status": t.status} for t in tasks]
 
 @mcp.tool()
+def search_tasks(query: str) -> list:
+    """Searches tasks by title (case-insensitive). Returns all matching tasks."""
+    from tasks.models import Task
+    tasks = Task.objects.filter(title__icontains=query)
+    return [
+        {"id": t.id, "title": t.title, "status": t.status, "priority": t.priority}
+        for t in tasks
+    ]
+
+@mcp.tool()
 def update_task(task_id: int, title: str | None = None, description: str | None = None) -> dict:
     """Updates the title and/or description of a task by ID. Omit a field to leave it unchanged."""
     from tasks.models import Task
