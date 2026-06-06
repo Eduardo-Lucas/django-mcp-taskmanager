@@ -25,6 +25,18 @@ def high_priority_tasks() -> list:
     return [{"id": t.id, "title": t.title, "status": t.status} for t in tasks]
 
 @mcp.tool()
+def filter_tasks_by_status(status: str) -> list:
+    """Returns all tasks with the given status. status: todo, doing, done."""
+    from tasks.models import Task
+    if status not in ("todo", "doing", "done"):
+        raise ValueError("status must be todo, doing, or done")
+    tasks = Task.objects.filter(status=status)
+    return [
+        {"id": t.id, "title": t.title, "status": t.status, "priority": t.priority}
+        for t in tasks
+    ]
+
+@mcp.tool()
 def search_tasks(query: str) -> list:
     """Searches tasks by title (case-insensitive). Returns all matching tasks."""
     from tasks.models import Task
