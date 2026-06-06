@@ -25,6 +25,21 @@ def high_priority_tasks() -> list:
     return [{"id": t.id, "title": t.title, "status": t.status} for t in tasks]
 
 @mcp.tool()
+def get_task(task_id: int) -> dict:
+    """Returns a single task by ID."""
+    from tasks.models import Task
+    task = Task.objects.get(id=task_id)
+    return {
+        "id": task.id,
+        "title": task.title,
+        "description": task.description,
+        "status": task.status,
+        "priority": task.priority,
+        "created_at": task.created_at.isoformat(),
+        "updated_at": task.updated_at.isoformat(),
+    }
+
+@mcp.tool()
 def list_tasks() -> list:
     """Returns all tasks ordered by priority (high to low) then creation date."""
     from tasks.models import Task
