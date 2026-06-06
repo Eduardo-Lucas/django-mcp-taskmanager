@@ -22,6 +22,7 @@ This project demonstrates how to embed an MCP server inside a Django application
 |---|---|
 | `task_summary` | Returns task counts grouped by status |
 | `high_priority_tasks` | Returns high-priority tasks that are not yet done |
+| `create_task` | Creates a new task with title, priority, description, and status |
 
 ## Data Model
 
