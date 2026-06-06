@@ -24,6 +24,17 @@ def high_priority_tasks() -> list:
     tasks = Task.objects.filter(priority=3).exclude(status="done")
     return [{"id": t.id, "title": t.title, "status": t.status} for t in tasks]
 
+@mcp.tool()
+def create_task(title: str, priority: int = 1, description: str = "", status: str = "todo") -> dict:
+    """Creates a new task. priority: 1=Low, 2=Medium, 3=High. status: todo, doing, done."""
+    from tasks.models import Task
+    if priority not in (1, 2, 3):
+        raise ValueError("priority must be 1, 2, or 3")
+    if status not in ("todo", "doing", "done"):
+        raise ValueError("status must be todo, doing, or done")
+    task = Task.objects.create(title=title, description=description, priority=priority, status=status)
+    return {"id": task.id, "title": task.title, "status": task.status, "priority": task.priority}
+
 mcp_app = mcp.http_app(path="/mcp", stateless_http=True)
 django_app = get_asgi_application()
 
