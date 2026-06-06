@@ -25,6 +25,18 @@ def high_priority_tasks() -> list:
     return [{"id": t.id, "title": t.title, "status": t.status} for t in tasks]
 
 @mcp.tool()
+def filter_tasks_by_priority(priority: int) -> list:
+    """Returns all tasks with the given priority. priority: 1=Low, 2=Medium, 3=High."""
+    from tasks.models import Task
+    if priority not in (1, 2, 3):
+        raise ValueError("priority must be 1, 2, or 3")
+    tasks = Task.objects.filter(priority=priority)
+    return [
+        {"id": t.id, "title": t.title, "status": t.status, "priority": t.priority}
+        for t in tasks
+    ]
+
+@mcp.tool()
 def filter_tasks_by_status(status: str) -> list:
     """Returns all tasks with the given status. status: todo, doing, done."""
     from tasks.models import Task
