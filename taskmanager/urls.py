@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from tasks.views import chat_page, chat_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('mcp_server.urls')),  # mount /mcp
+    path('', include('mcp_server.urls')),
+    path('chat/', chat_page),
+    path('chat/api/', chat_api),
 ]

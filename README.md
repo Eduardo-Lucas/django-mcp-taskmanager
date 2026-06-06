@@ -1,10 +1,10 @@
 # django-mcp-taskmanager
 
-A Django-based task manager that exposes its data to AI agents via the [Model Context Protocol (MCP)](https://modelcontextprotocol.io), using [FastMCP](https://gofastmcp.com) over Streamable HTTP.
+A Django-based task manager that exposes its data to AI agents via the [Model Context Protocol (MCP)](https://modelcontextprotocol.io), using [FastMCP](https://gofastmcp.com) over Streamable HTTP. Includes a browser-based chat UI powered by Claude.
 
 ## Overview
 
-This project demonstrates how to embed an MCP server inside a Django application using ASGI. Claude (or any MCP-compatible client) can query task data in real time through two built-in tools.
+This project demonstrates how to embed an MCP server inside a Django application using ASGI. Claude (or any MCP-compatible client) can query and manage task data in real time through a full set of tools. A built-in chat interface lets you interact with your tasks in plain English.
 
 ## Stack
 
@@ -14,20 +14,21 @@ This project demonstrates how to embed an MCP server inside a Django application
 | ASGI server | Uvicorn 0.49 |
 | MCP server | FastMCP 3.4.2 |
 | MCP transport | Streamable HTTP (stateless) |
+| AI model | Claude claude-sonnet-4-6 (Anthropic) |
 | Database | SQLite (dev) |
 
 ## MCP Tools
 
 | Tool | Description |
 |---|---|
+| `list_tasks` | Returns all tasks ordered by priority then creation date |
+| `get_task` | Returns a single task by ID with full details |
 | `task_summary` | Returns task counts grouped by status |
 | `high_priority_tasks` | Returns high-priority tasks that are not yet done |
-| `create_task` | Creates a new task with title, priority, description, and status |
-| `get_task` | Returns a single task by ID with full details |
-| `filter_tasks_by_priority` | Returns all tasks with a given priority (1=Low, 2=Medium, 3=High) |
 | `filter_tasks_by_status` | Returns all tasks with a given status (todo, doing, done) |
+| `filter_tasks_by_priority` | Returns all tasks with a given priority (1=Low, 2=Medium, 3=High) |
 | `search_tasks` | Searches tasks by title (case-insensitive) |
-| `list_tasks` | Returns all tasks ordered by priority then creation date |
+| `create_task` | Creates a new task with title, priority, description, and status |
 | `update_task` | Updates the title and/or description of a task by ID |
 | `update_task_status` | Updates the status of a task by ID (todo, doing, done) |
 | `update_task_priority` | Updates the priority of a task by ID (1=Low, 2=Medium, 3=High) |
@@ -57,23 +58,33 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run migrations
+### 2. Configure environment
+
+Create a `.env` file in the project root:
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Get your key at [console.anthropic.com](https://console.anthropic.com).
+
+### 3. Run migrations
 
 ```bash
 python manage.py migrate
 ```
 
-### 3. Start the server
+### 4. Start the server
 
 ```bash
 uvicorn taskmanager.asgi:application --port 8000
 ```
 
-The MCP endpoint is available at `http://localhost:8000/mcp`.
+### 5. Open the chat UI
 
-## Connecting to Claude
+Go to `http://localhost:8000/chat/` and start managing tasks in plain English.
 
-### Claude Code (CLI)
+## Connecting to Claude Code (CLI)
 
 ```bash
 claude mcp add taskmanager --transport http http://localhost:8000/mcp
@@ -81,7 +92,7 @@ claude mcp add taskmanager --transport http http://localhost:8000/mcp
 
 Then start a new Claude Code session — the tools load automatically.
 
-### Claude.ai (browser)
+## Connecting to Claude.ai (browser)
 
 Expose the local server with ngrok:
 
@@ -95,26 +106,31 @@ Then go to **claude.ai → Settings → Integrations** and add the ngrok HTTPS U
 
 ## Architecture
 
-Requests are routed by a custom ASGI dispatcher in `taskmanager/asgi.py`:
-
 ```
 Request
-├── /mcp  →  FastMCP (stateless Streamable HTTP)
-└── /*    →  Django
+├── /mcp    →  FastMCP (stateless Streamable HTTP)
+├── /chat/  →  Chat UI (Django template)
+└── /*      →  Django
 ```
 
-This avoids Starlette 1.x's `Mount` trailing-slash requirement by matching paths directly in the ASGI layer.
+Requests are routed by a custom ASGI dispatcher in `taskmanager/asgi.py`, avoiding Starlette 1.x's `Mount` trailing-slash limitation.
+
+The chat UI calls the Anthropic API directly from a Django view, executing tool calls against the local database and streaming responses back to the browser via SSE.
 
 ## Project Structure
 
 ```
 taskmanager/
+├── .env                         # ANTHROPIC_API_KEY (not committed)
 ├── taskmanager/
-│   ├── asgi.py       # ASGI router: FastMCP + Django
+│   ├── asgi.py                  # ASGI router: FastMCP + Django
 │   ├── settings.py
 │   └── urls.py
 └── tasks/
-    ├── models.py     # Task model
-    ├── mcp.py        # MCP tool definitions
-    └── views.py
+    ├── models.py                # Task model
+    ├── tools.py                 # Tool definitions shared by chat and MCP
+    ├── mcp.py                   # MCP server tool registrations
+    ├── views.py                 # Chat page and API views
+    └── templates/tasks/
+        └── chat.html            # Chat UI
 ```
