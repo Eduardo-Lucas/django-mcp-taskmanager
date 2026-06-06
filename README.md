@@ -80,6 +80,8 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
+> Or programmatically: `python manage.py shell -c "from django.contrib.auth import get_user_model; get_user_model().objects.create_superuser('admin', '', 'admin123')"`
+
 ### 5. Start the server
 
 ```bash
@@ -88,7 +90,7 @@ uvicorn taskmanager.asgi:application --port 8000
 
 ### 6. Open the chat UI
 
-Go to `http://localhost:8000/chat/` — you'll be redirected to the login page. After signing in you can start managing tasks in plain English.
+Go to `http://localhost:8000/chat/` — you'll be redirected to the login page. Sign in with your credentials and start managing tasks in plain English. A **Sign out** button is available in the header.
 
 ## Connecting to Claude Code (CLI)
 
