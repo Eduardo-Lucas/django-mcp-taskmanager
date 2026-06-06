@@ -25,6 +25,15 @@ def high_priority_tasks() -> list:
     return [{"id": t.id, "title": t.title, "status": t.status} for t in tasks]
 
 @mcp.tool()
+def delete_task(task_id: int) -> dict:
+    """Deletes a task by ID. Returns the deleted task's title and id."""
+    from tasks.models import Task
+    task = Task.objects.get(id=task_id)
+    title = task.title
+    task.delete()
+    return {"deleted": True, "id": task_id, "title": title}
+
+@mcp.tool()
 def update_task_status(task_id: int, status: str) -> dict:
     """Updates the status of a task. status: todo, doing, done."""
     from tasks.models import Task

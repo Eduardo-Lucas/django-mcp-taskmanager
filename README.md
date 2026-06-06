@@ -24,6 +24,7 @@ This project demonstrates how to embed an MCP server inside a Django application
 | `high_priority_tasks` | Returns high-priority tasks that are not yet done |
 | `create_task` | Creates a new task with title, priority, description, and status |
 | `update_task_status` | Updates the status of a task by ID (todo, doing, done) |
+| `delete_task` | Deletes a task by ID |
 
 ## Data Model
 
