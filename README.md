@@ -26,6 +26,7 @@ This project demonstrates how to embed an MCP server inside a Django application
 | `get_task` | Returns a single task by ID with full details |
 | `list_tasks` | Returns all tasks ordered by priority then creation date |
 | `update_task_status` | Updates the status of a task by ID (todo, doing, done) |
+| `update_task_priority` | Updates the priority of a task by ID (1=Low, 2=Medium, 3=High) |
 | `delete_task` | Deletes a task by ID |
 
 ## Data Model

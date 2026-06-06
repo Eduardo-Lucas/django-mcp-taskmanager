@@ -25,6 +25,17 @@ def high_priority_tasks() -> list:
     return [{"id": t.id, "title": t.title, "status": t.status} for t in tasks]
 
 @mcp.tool()
+def update_task_priority(task_id: int, priority: int) -> dict:
+    """Updates the priority of a task by ID. priority: 1=Low, 2=Medium, 3=High."""
+    from tasks.models import Task
+    if priority not in (1, 2, 3):
+        raise ValueError("priority must be 1, 2, or 3")
+    task = Task.objects.get(id=task_id)
+    task.priority = priority
+    task.save()
+    return {"id": task.id, "title": task.title, "priority": task.priority}
+
+@mcp.tool()
 def get_task(task_id: int) -> dict:
     """Returns a single task by ID."""
     from tasks.models import Task
