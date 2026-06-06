@@ -1,6 +1,7 @@
 import json
 import os
 import anthropic
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
@@ -14,10 +15,12 @@ SYSTEM = (
 )
 
 
+@login_required
 def chat_page(request):
     return render(request, "tasks/chat.html")
 
 
+@login_required
 @csrf_exempt
 def chat_api(request):
     if request.method != "POST":

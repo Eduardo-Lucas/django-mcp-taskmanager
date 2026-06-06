@@ -74,15 +74,21 @@ Get your key at [console.anthropic.com](https://console.anthropic.com).
 python manage.py migrate
 ```
 
-### 4. Start the server
+### 4. Create a user
+
+```bash
+python manage.py createsuperuser
+```
+
+### 5. Start the server
 
 ```bash
 uvicorn taskmanager.asgi:application --port 8000
 ```
 
-### 5. Open the chat UI
+### 6. Open the chat UI
 
-Go to `http://localhost:8000/chat/` and start managing tasks in plain English.
+Go to `http://localhost:8000/chat/` — you'll be redirected to the login page. After signing in you can start managing tasks in plain English.
 
 ## Connecting to Claude Code (CLI)
 

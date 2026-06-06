@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from tasks.views import chat_page, chat_api
 
@@ -23,4 +24,6 @@ urlpatterns = [
     path('', include('mcp_server.urls')),
     path('chat/', chat_page),
     path('chat/api/', chat_api),
+    path('login/', auth_views.LoginView.as_view(template_name='tasks/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 ]
